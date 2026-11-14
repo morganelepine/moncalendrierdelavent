@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { Image } from "expo-image";
 import { CustomButton } from "@/components/utils/buttons/Button";
 import { ShareCardPreview } from "@/components/utils/share/ShareCard";
-import { ShareBackgroundPicker } from "@/components/utils/share/ShareBackgroundPicker";
 import { RecapCard } from "@/components/retrospective/RecapCard";
 import {
     StoryBackground,
@@ -18,9 +18,9 @@ import { GamesSlide } from "@/components/retrospective/slides/GamesSlide";
 import { ChallengesSlide } from "@/components/retrospective/slides/ChallengesSlide";
 import { PointsSlide } from "@/components/retrospective/slides/PointsSlide";
 import { Theme } from "@/constants/Colors";
-import { COUNTDOWN_SHARE_BACKGROUNDS } from "@/constants/shareBackgrounds";
+import { RETROSPECTIVE_SHARE_BACKGROUND } from "@/constants/shareBackgrounds";
 import { Retrospective } from "@/interfaces/retrospectiveInterface";
-import { isShareSupported } from "@/services/share.service";
+import { isShareSupported, shareView } from "@/services/share.service";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
 
 // Header + footer buttons around the recap card preview.
@@ -56,7 +56,8 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
     visible,
     onClose,
 }) => {
-    const [pickerVisible, setPickerVisible] = useState(false);
+    const recapCardRef = useRef<View>(null);
+    const [sharing, setSharing] = useState(false);
 
     // Avoids blank frames and icons while each slide's images download.
     // Same URLs as StoryViewer and Comparison, so the cache serves them.
@@ -69,6 +70,7 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
                 ...Object.values(ICONS).map((icon) =>
                     getCloudinaryImageUrl(icon),
                 ),
+                getCloudinaryImageUrl(RETROSPECTIVE_SHARE_BACKGROUND),
             ]);
         }
     }, [visible]);
@@ -76,6 +78,13 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
     const { year, correctAnswers, challengesCompleted, longestStreak } =
         retrospective;
     const shareMessage = `Voici la rétrospective de mon Avent 🎄 Quelle est la tienne ?`;
+
+    // The on-screen preview is the captured card: one background only, no picker.
+    const shareRecap = async (): Promise<void> => {
+        setSharing(true);
+        await shareView(recapCardRef, shareMessage, "story");
+        setSharing(false);
+    };
 
     const slides: StorySlide[] = [
         {
@@ -138,7 +147,10 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
             key: "recap",
             content: (
                 <ShareCardPreview
-                    backgroundImage={COUNTDOWN_SHARE_BACKGROUNDS[0]}
+                    ref={recapCardRef}
+                    backgroundImage={RETROSPECTIVE_SHARE_BACKGROUND}
+                    format="story"
+                    plain
                     reservedHeight={RECAP_RESERVED_HEIGHT}
                 >
                     <RecapCard retrospective={retrospective} />
@@ -147,7 +159,9 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
             footer: isShareSupported && (
                 <CustomButton
                     color={Theme.orangeToRed}
-                    onPress={() => setPickerVisible(true)}
+                    onPress={shareRecap}
+                    loading={sharing}
+                    disabled={sharing}
                 >
                     Partager ma carte
                 </CustomButton>
@@ -155,18 +169,5 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
         },
     ];
 
-    return (
-        <StoryViewer visible={visible} onClose={onClose} slides={slides}>
-            {isShareSupported && (
-                <ShareBackgroundPicker
-                    visible={pickerVisible}
-                    onClose={() => setPickerVisible(false)}
-                    backgrounds={COUNTDOWN_SHARE_BACKGROUNDS}
-                    message={shareMessage}
-                >
-                    <RecapCard retrospective={retrospective} />
-                </ShareBackgroundPicker>
-            )}
-        </StoryViewer>
-    );
+    return <StoryViewer visible={visible} onClose={onClose} slides={slides} />;
 };

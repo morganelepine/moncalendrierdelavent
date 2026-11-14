@@ -14,31 +14,31 @@ export const TIME_PROFILES: Record<
     { title: string; slot: string; description: string }
 > = {
     dawn: {
-        title: "Lutin de l'aube",
+        title: "Lutin·e de l'aube",
         slot: "entre 5h et 9h",
         description:
             "La Mère Noël n'avait même pas fini son café que vous aviez déjà ouvert votre case !",
     },
     morning: {
-        title: "Lutin matinal",
+        title: "Lutin·e matinal·e",
         slot: "entre 9h et 12h",
         description:
             "Une tasse fumante à la main, vous vous offriez une parenthèse enchantée au milieu de la matinée. Les lutins appellent ça une pause bien méritée !",
     },
     afternoon: {
-        title: "Lutin flâneur",
+        title: "Lutin·e flâneur·euse",
         slot: "entre 12h et 17h",
         description:
             "Entre deux biscuits, votre case avait sa place réservée. Une pause sucrée, une pincée de magie, et la journée repartait de plus belle.",
     },
     evening: {
-        title: "Lutin du soir",
+        title: "Lutin·e du soir",
         slot: "entre 17h et 22h",
         description:
             "Pourquoi se précipiter ? Vous gardiez l'ouverture de votre case pour la soirée, comme on garde le meilleur pour la fin.",
     },
     night: {
-        title: "Lutin des étoiles",
+        title: "Lutin·e des étoiles",
         slot: "entre 22h et 5h",
         description:
             "Pendant que les autres rêvaient de Noël, vous étiez déjà en train de découvrir ses secrets…",
@@ -62,7 +62,12 @@ export const getHigherThanText = (
 export const getTopText = (
     topPercent: number,
     playerCount?: number,
-): string | null =>
-    topPercent <= MAX_TOP_PERCENT
-        ? `Top ${formatPercent(topPercent)}\ndes\u00a0${playerCount ? `${formatNumber(playerCount)} ` : ""}joueur·euse·s`
+): string | null => {
+    const playerCountText = playerCount
+        ? `\ndes\u00a0${formatNumber(playerCount)} `
+        : "des\u00a0";
+
+    return topPercent <= MAX_TOP_PERCENT
+        ? `Top ${formatPercent(topPercent)} ${playerCountText}joueur·euse·s`
         : null;
+};

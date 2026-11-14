@@ -24,3 +24,6 @@ export const COUNTDOWN_SHARE_BACKGROUNDS = isOctober
 export const QUIZ_SHARE_BACKGROUND = isOctober
     ? "share-quiz-autumn_rymfhb"
     : "share-quiz-christmas_cmjhej";
+
+// 9:16, for the retrospective's recap card (see RecapCard).
+export const RETROSPECTIVE_SHARE_BACKGROUND = "share-retro-story_i617v9";

@@ -1,7 +1,7 @@
 import { RefObject } from "react";
 import { TurboModuleRegistry, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
-import { SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH } from "@/constants/shareImage";
+import { SHARE_FORMATS, ShareFormat } from "@/constants/shareImage";
 
 // react-native-share's native module isn't in Expo Go.
 export const isShareSupported = TurboModuleRegistry.get("RNShare") != null;
@@ -13,6 +13,7 @@ export const isShareSupported = TurboModuleRegistry.get("RNShare") != null;
 export const shareView = async (
     ref: RefObject<View | null>,
     message: string,
+    format: ShareFormat = "post",
 ): Promise<void> => {
     if (!isShareSupported) return;
 
@@ -21,8 +22,8 @@ export const shareView = async (
         imageUri = await captureRef(ref, {
             format: "jpg",
             quality: 0.9,
-            width: SHARE_IMAGE_WIDTH,
-            height: SHARE_IMAGE_HEIGHT,
+            width: SHARE_FORMATS[format].width,
+            height: SHARE_FORMATS[format].height,
             result: "tmpfile",
         });
     } catch {
