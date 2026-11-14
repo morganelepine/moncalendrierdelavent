@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { ThemedText } from "@/components/ThemedText";
 import { CustomMarkdown } from "@/components/utils/custom/Markdown";
 import { CustomButton } from "@/components/utils/buttons/Button";
@@ -11,6 +12,10 @@ import { QUIZ_SHARE_BACKGROUND } from "@/constants/shareBackgrounds";
 import { Content, PersonalityQuizAnswer } from "@/interfaces/contentInterface";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
 import { isShareSupported, shareView } from "@/services/share.service";
+import {
+    downloadView,
+    isViewDownloadSupported,
+} from "@/services/download.service";
 import { completeChallenge } from "@/services/challenge.service";
 import {
     computeProfile,
@@ -110,12 +115,12 @@ export const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ idea }) => {
                         <CustomButton
                             color={Theme.orangeToGreen}
                             onPress={restart}
+                            style={{ marginHorizontal: 0 }}
                         >
                             Recommencer
                         </CustomButton>
                         {isShareSupported && (
-                            <CustomButton
-                                color={Theme.orangeToRed}
+                            <Pressable
                                 onPress={async () => {
                                     await shareView(
                                         shareCardRef,
@@ -125,13 +130,34 @@ export const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ idea }) => {
                                         ChallengeId.ShareQuizProfile,
                                     );
                                 }}
+                                style={styles.button}
                             >
-                                Partager
-                            </CustomButton>
+                                <View style={styles.buttonBackground} />
+                                <Ionicons
+                                    name="share-social"
+                                    size={26}
+                                    color={Colors.green}
+                                />
+                            </Pressable>
+                        )}
+                        {isViewDownloadSupported && (
+                            <Pressable
+                                onPress={async () => {
+                                    await downloadView(shareCardRef);
+                                }}
+                                style={styles.button}
+                            >
+                                <View style={styles.buttonBackground} />
+                                <Ionicons
+                                    name="download-outline"
+                                    size={26}
+                                    color={Colors.green}
+                                />
+                            </Pressable>
                         )}
                     </View>
 
-                    {isShareSupported && (
+                    {(isShareSupported || isViewDownloadSupported) && (
                         <ShareCard
                             ref={shareCardRef}
                             backgroundImage={QUIZ_SHARE_BACKGROUND}
@@ -188,6 +214,8 @@ const styles = StyleSheet.create({
     buttons: {
         gap: 12,
         marginVertical: 20,
+        flexDirection: "row",
+        justifyContent: "center",
     },
     shareQuizTitle: {
         fontFamily: "PoppinsBold",
@@ -206,5 +234,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textAlign: "center",
         color: Colors.snow,
+    },
+    button: {
+        height: 42,
+        width: 42,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonBackground: {
+        ...StyleSheet.absoluteFillObject,
+        borderWidth: 1.5,
+        borderColor: Colors.green,
+        borderRadius: 50,
     },
 });

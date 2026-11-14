@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import { CustomButton } from "@/components/utils/buttons/Button";
 import { ShareCardPreview } from "@/components/utils/share/ShareCard";
@@ -17,10 +17,14 @@ import { ProfileSlide } from "@/components/retrospective/slides/ProfileSlide";
 import { GamesSlide } from "@/components/retrospective/slides/GamesSlide";
 import { ChallengesSlide } from "@/components/retrospective/slides/ChallengesSlide";
 import { PointsSlide } from "@/components/retrospective/slides/PointsSlide";
-import { Theme } from "@/constants/Colors";
+import { Colors } from "@/constants/Colors";
 import { RETROSPECTIVE_SHARE_BACKGROUND } from "@/constants/shareBackgrounds";
 import { Retrospective } from "@/interfaces/retrospectiveInterface";
 import { isShareSupported, shareView } from "@/services/share.service";
+import {
+    downloadView,
+    isViewDownloadSupported,
+} from "@/services/download.service";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
 
 // Header + footer buttons around the recap card preview.
@@ -58,6 +62,7 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
 }) => {
     const recapCardRef = useRef<View>(null);
     const [sharing, setSharing] = useState(false);
+    const [downloading, setDownloading] = useState(false);
 
     // Avoids blank frames and icons while each slide's images download.
     // Same URLs as StoryViewer and Comparison, so the cache serves them.
@@ -84,6 +89,12 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
         setSharing(true);
         await shareView(recapCardRef, shareMessage, "story");
         setSharing(false);
+    };
+
+    const downloadRecap = async (): Promise<void> => {
+        setDownloading(true);
+        await downloadView(recapCardRef, "story");
+        setDownloading(false);
     };
 
     const slides: StorySlide[] = [
@@ -156,18 +167,44 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
                     <RecapCard retrospective={retrospective} />
                 </ShareCardPreview>
             ),
-            footer: isShareSupported && (
-                <CustomButton
-                    color={Theme.orangeToRed}
-                    onPress={shareRecap}
-                    loading={sharing}
-                    disabled={sharing}
-                >
-                    Partager ma carte
-                </CustomButton>
+            footer: (isShareSupported || isViewDownloadSupported) && (
+                <View style={styles.recapButtons}>
+                    {isShareSupported && (
+                        <CustomButton
+                            style={styles.recapButton}
+                            color={Colors.lightRed}
+                            onPress={shareRecap}
+                            loading={sharing}
+                            disabled={sharing}
+                        >
+                            Partager
+                        </CustomButton>
+                    )}
+                    {isViewDownloadSupported && (
+                        <CustomButton
+                            style={styles.recapButton}
+                            color={Colors.greenRecap}
+                            onPress={downloadRecap}
+                            loading={downloading}
+                        >
+                            Télécharger
+                        </CustomButton>
+                    )}
+                </View>
             ),
         },
     ];
 
     return <StoryViewer visible={visible} onClose={onClose} slides={slides} />;
 };
+
+const styles = StyleSheet.create({
+    recapButtons: {
+        flexDirection: "row",
+        gap: 12,
+    },
+    recapButton: {
+        flex: 1,
+        marginHorizontal: 0,
+    },
+});

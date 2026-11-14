@@ -23,41 +23,38 @@ export const Gift25: React.FC<GiftProps> = ({ gift }) => {
         rotation.value = withRepeat(
             withTiming(gift.oscillation, { duration: gift.timing }), // Oscillation à gift.oscillation degrés
             -1, // Répéter infiniment
-            true // Revenir au point de départ après chaque cycle
+            true, // Revenir au point de départ après chaque cycle
         );
-    }, []);
+    }, [rotation, gift.oscillation, gift.timing]);
 
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                { rotate: `${rotation.value}deg` }, // Appliquer la rotation
-            ],
-        };
-    });
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${rotation.value}deg` }], // Appliquer la rotation
+    }));
 
-    const openGift = () => {
+    const openGift = (): void => {
         if (gift.win) {
-            router.navigate({
-                pathname: "/calendar/day25",
-            });
+            router.navigate({ pathname: "/calendar/day25" });
         } else {
             showToast("Ouvrez un autre cadeau !");
         }
     };
 
     return (
-        <>
-            <Pressable style={styles.cell} onPress={openGift}>
-                <Animated.View style={[animatedStyle]}>
-                    <Image
-                        source={{ uri: getCloudinaryImageUrl(gift.image) }}
-                        style={styles.itemBackground}
-                        contentFit="contain"
-                        cachePolicy="memory-disk"
-                    />
-                </Animated.View>
-            </Pressable>
-        </>
+        <Pressable
+            style={styles.cell}
+            onPress={openGift}
+            accessibilityRole="button"
+            accessibilityLabel={`Ouvrir le cadeau ${gift.id}`}
+        >
+            <Animated.View style={animatedStyle}>
+                <Image
+                    source={{ uri: getCloudinaryImageUrl(gift.image) }}
+                    style={styles.itemBackground}
+                    contentFit="contain"
+                    cachePolicy="memory-disk"
+                />
+            </Animated.View>
+        </Pressable>
     );
 };
 

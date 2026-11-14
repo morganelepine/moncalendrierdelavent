@@ -116,9 +116,7 @@ export default function Day25Screen() {
                         pouvoir profiter encore un peu de l'ambiance de Noël.
                     </ThemedText>
                     <ThemedText type="sectionText" style={styles.explanations}>
-                        Cliquez sur une image pour l'afficher en grand puis
-                        faites une capture d'écran et redimensionnez si
-                        nécessaire !
+                        Cliquez sur une image pour la télécharger !
                     </ThemedText>
                     <Wallpapers datas={wallpapers} type={"wallpapers"} />
                 </View>
@@ -151,9 +149,7 @@ export default function Day25Screen() {
                         !
                     </ThemedText>
                     <ThemedText type="sectionText" style={styles.explanations}>
-                        Cliquez sur le titre pour afficher la recette puis
-                        faites une capture d'écran et redimensionnez si
-                        nécessaire !
+                        Cliquez sur une recette pour la télécharger !
                     </ThemedText>
                     <Wallpapers datas={recipes} type={"recipes"} />
                 </View>

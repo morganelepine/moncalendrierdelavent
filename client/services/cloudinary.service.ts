@@ -23,6 +23,16 @@ export const getCloudinaryImageUrl = (
     return `${CLOUDINARY_BASE_URL}${transformations}/${publicId}`;
 };
 
+/**
+ * Full-size JPEG of an image, for saving it: f_auto may serve AVIF, which
+ * galleries don't all read. fl_attachment makes browsers download it.
+ */
+export const getCloudinaryDownloadUrl = (
+    publicId: string,
+    asAttachment = false,
+): string =>
+    `${CLOUDINARY_BASE_URL}f_jpg,q_auto${asAttachment ? ",fl_attachment" : ""}/${publicId}`;
+
 // 96 kbps is plenty for background music and cuts the files 2-3x (bandwidth
 // is most of the Cloudinary bill). The .mp3 extension makes Cloudinary drop
 // the video track of .mp4 sources.

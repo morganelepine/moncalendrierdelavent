@@ -10,6 +10,7 @@ import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { FadeIn } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ToastHost } from "@/components/utils/Toast";
 import { Colors } from "@/constants/Colors";
 import { TOP_BOTTOM_EDGES } from "@/constants/safeAreaEdges";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
@@ -204,6 +205,8 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 
                     {children}
                 </SafeAreaView>
+
+                <ToastHost />
             </View>
         </Modal>
     );

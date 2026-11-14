@@ -1,30 +1,52 @@
 import React, { useState } from "react";
-import { StyleSheet, Pressable, View, Dimensions } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
-import { CenteredModal } from "@/components/utils/custom/CenteredModal";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
+import { downloadImage } from "@/services/download.service";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { WallpaperData } from "@/interfaces/contentInterface";
 
 interface WallpapersProps {
     datas: WallpaperData[];
-    type: string;
+    type: "wallpapers" | "recipes";
 }
 
-export const Wallpapers = ({ datas, type }: WallpapersProps) => {
-    const { width, height } = Dimensions.get("window");
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+export const Wallpapers: React.FC<WallpapersProps> = ({ datas, type }) => {
+    const [downloadingId, setDownloadingId] = useState<
+        WallpaperData["id"] | null
+    >(null);
+
+    const download = async (data: WallpaperData): Promise<void> => {
+        setDownloadingId(data.id);
+        await downloadImage(data.image);
+        setDownloadingId(null);
+    };
 
     return (
-        <>
-            <View style={styles.gallery}>
-                {datas.map((data) =>
-                    type === "wallpapers" ? (
-                        <Pressable
-                            key={data.id}
-                            onPress={() => setSelectedImage(data.image)}
-                        >
+        <View style={styles.gallery}>
+            {datas.map((data, index) => {
+                const isDownloading = downloadingId === data.id;
+                const label =
+                    type === "wallpapers"
+                        ? `Télécharger le fond d'écran ${index + 1}`
+                        : `Télécharger la recette ${data.title}`;
+
+                return (
+                    <Pressable
+                        key={data.id}
+                        onPress={() => void download(data)}
+                        disabled={downloadingId !== null}
+                        accessibilityRole="button"
+                        accessibilityLabel={label}
+                        accessibilityState={{ busy: isDownloading }}
+                        hitSlop={type === "recipes" ? 8 : undefined}
+                        style={({ pressed }) => [
+                            type === "recipes" && styles.button,
+                            pressed && styles.pressed,
+                        ]}
+                    >
+                        {type === "wallpapers" ? (
                             <Image
                                 source={{
                                     uri: getCloudinaryImageUrl(data.image),
@@ -33,55 +55,25 @@ export const Wallpapers = ({ datas, type }: WallpapersProps) => {
                                 cachePolicy="memory-disk"
                                 style={styles.thumbnail}
                             />
-                        </Pressable>
-                    ) : (
-                        <Pressable
-                            key={data.id}
-                            onPress={() => setSelectedImage(data.image)}
-                            style={styles.button}
-                        >
-                            <ThemedText
-                                style={{ fontSize: 14, textAlign: "center" }}
-                            >
+                        ) : (
+                            <ThemedText style={styles.buttonText}>
                                 {data.title}
                             </ThemedText>
-                        </Pressable>
-                    )
-                )}
-            </View>
-
-            <CenteredModal
-                visible={!!selectedImage}
-                onRequestClose={() => setSelectedImage(null)}
-                overlayOpacity={0.8}
-                contentStyle={styles.imageModalContent}
-            >
-                <Pressable onPress={() => setSelectedImage(null)}>
-                    {selectedImage && (
-                        <Image
-                            source={{
-                                uri: getCloudinaryImageUrl(selectedImage),
-                            }}
-                            contentFit="contain"
-                            cachePolicy="memory-disk"
-                            style={{
-                                height: height,
-                                width: width,
-                            }}
-                        />
-                    )}
-                </Pressable>
-            </CenteredModal>
-        </>
+                        )}
+                        {isDownloading && (
+                            <ActivityIndicator
+                                color={Colors.snow}
+                                style={styles.loader}
+                            />
+                        )}
+                    </Pressable>
+                );
+            })}
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    imageModalContent: {
-        margin: 0,
-        backgroundColor: "transparent",
-        borderRadius: 0,
-    },
     gallery: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -89,9 +81,10 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
     },
+    // 48 wide: minimum touch target size.
     thumbnail: {
-        width: 45,
-        height: 80,
+        width: 48,
+        height: 85,
         borderRadius: 5,
         margin: 2,
     },
@@ -104,5 +97,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Colors.red,
         alignSelf: "center",
+    },
+    buttonText: {
+        fontSize: 14,
+        textAlign: "center",
+    },
+    pressed: {
+        opacity: 0.7,
+    },
+    loader: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        borderRadius: 5,
     },
 });

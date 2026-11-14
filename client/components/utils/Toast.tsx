@@ -37,19 +37,25 @@ type ToastListener = (
     action?: ToastAction,
 ) => void;
 
-let listener: ToastListener | null = null;
+// A Modal renders above the root host: a ToastHost mounted inside it takes
+// over while it's open, so the latest mounted host shows the toasts.
+const listeners: ToastListener[] = [];
+
+const notify: ToastListener = (...args) => {
+    listeners.at(-1)?.(...args);
+};
 
 export function showToast(
     message: string,
     duration: ToastDuration = "short",
     action?: ToastAction,
 ) {
-    listener?.(message, duration, "default", action);
+    notify(message, duration, "default", action);
 }
 
 // Celebratory variant for point gains.
 export function showPointsToast(points: number) {
-    listener?.(`+${points} points`, "short", "points");
+    notify(`+${points} points`, "short", "points");
 }
 
 export function ToastHost() {
@@ -79,7 +85,12 @@ export function ToastHost() {
     }, []);
 
     useEffect(() => {
-        listener = (nextMessage, duration, nextVariant, nextAction) => {
+        const listener: ToastListener = (
+            nextMessage,
+            duration,
+            nextVariant,
+            nextAction,
+        ) => {
             if (hideTimer.current) clearTimeout(hideTimer.current);
 
             setMessage(nextMessage);
@@ -135,8 +146,10 @@ export function ToastHost() {
             );
         };
 
+        listeners.push(listener);
+
         return () => {
-            listener = null;
+            listeners.splice(listeners.indexOf(listener), 1);
             if (hideTimer.current) clearTimeout(hideTimer.current);
         };
     }, [opacity, scale, confetti]);
