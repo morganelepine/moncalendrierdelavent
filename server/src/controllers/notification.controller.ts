@@ -7,7 +7,7 @@ import { isReminderSlot, ReminderSlot } from "../lib/reminderSlot";
 type Season = "halloween" | "christmas";
 
 // Read from the clock rather than a cron path query so a delayed run still
-// lands on the right slot: the crons fire at 8:00 and 18:00 UTC.
+// lands on the right slot: the crons fire at 7/8h and 16/17h UTC.
 function getCurrentSlot(): ReminderSlot {
     return new Date().getUTCHours() < 12 ? "morning" : "evening";
 }
@@ -53,7 +53,7 @@ function buildReminderContent(
 
 export class NotificationController {
     // GET /notifications/send-daily-reminder
-    // Triggered by the Vercel Cron jobs every morning and evening in October
+    // Triggered by the Vercel Schedules every morning and evening in October
     // and in December (see server/vercel.json - four schedules, same endpoint).
     // Each run only notifies the users who picked that slot.
     async sendDailyReminder(

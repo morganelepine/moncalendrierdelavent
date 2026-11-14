@@ -12,26 +12,31 @@
             "dest": "/src/index.ts"
         }
     ],
-    "crons": [
-        {
+    "schedules": {
+        "reminder-christmas-morning": {
+            "schedule": "0 8 1-25 12 *",
             "path": "/notifications/send-daily-reminder",
-            "schedule": "0 8 1-25 12 *"
+            "requestMethod": "GET"
         },
-        {
+        "reminder-halloween-morning": {
+            "schedule": "0 7 * 10 *",
             "path": "/notifications/send-daily-reminder",
-            "schedule": "0 7 * 10 *"
+            "requestMethod": "GET"
         },
-        {
+        "reminder-christmas-evening": {
+            "schedule": "0 17 1-25 12 *",
             "path": "/notifications/send-daily-reminder",
-            "schedule": "0 17 1-25 12 *"
+            "requestMethod": "GET"
         },
-        {
+        "reminder-halloween-evening": {
+            "schedule": "0 16 * 10 *",
             "path": "/notifications/send-daily-reminder",
-            "schedule": "0 16 * 10 *"
+            "requestMethod": "GET"
         },
-        {
+        "retrospective-compute": {
+            "schedule": "0 23 24-25 12 *",
             "path": "/retrospective/compute",
-            "schedule": "0 23 24-25 12 *"
+            "requestMethod": "GET"
         }
-    ]
+    }
 }

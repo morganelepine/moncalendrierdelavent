@@ -72,7 +72,7 @@ const getTopPercent = (percentiles: number[], points: number): number => {
 
 export class RetrospectiveController {
     // GET /retrospective/compute?year=2026
-    // Vercel Cron, Dec 24th and 25th at midnight French time (see vercel.json).
+    // Vercel Schedule, Dec 24th and 25th at midnight French time (see vercel.json).
     // The second run picks up offline scores flushed late. Idempotent.
     async compute(request: Request) {
         if (!isCronRequest(request)) {
