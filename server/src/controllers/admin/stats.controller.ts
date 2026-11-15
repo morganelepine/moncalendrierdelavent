@@ -61,6 +61,14 @@ interface DateRow {
     count: bigint;
 }
 
+interface ClickRow {
+    event: string;
+    source: string | null;
+    isEventTotal: boolean;
+    clicks: bigint;
+    users: bigint;
+}
+
 // A Postgres DATE comes back as a Date at UTC midnight.
 const toDateKey = (date: Date): string => date.toISOString().slice(0, 10);
 
@@ -93,6 +101,7 @@ export class AdminStatsController {
             challengeUsers,
             challengesDone,
             challengesByDay,
+            clickRows,
         ] = await Promise.all([
             prisma.$queryRaw<CountRow[]>`
                 SELECT "day" AS key, COUNT(DISTINCT "userId") AS users
@@ -188,6 +197,17 @@ export class AdminStatsController {
                     GROUP BY "day"
                     ORDER BY "day"`
                 : Promise.resolve([]),
+            // Whole year, not just the season: clicks happen before it starts too.
+            // GROUPING SETS gives distinct users per event, which can't be
+            // summed from the per-source rows.
+            prisma.$queryRaw<ClickRow[]>`
+                SELECT "event", "source",
+                       GROUPING("source") = 1 AS "isEventTotal",
+                       COUNT(*) AS clicks,
+                       COUNT(DISTINCT "userUuid") AS users
+                FROM "ClickEvent"
+                WHERE EXTRACT(YEAR FROM "createdAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Paris') = ${year}
+                GROUP BY GROUPING SETS (("event"), ("event", "source"))`,
         ]);
 
         const toDateSeries = (rows: DateRow[]) =>
@@ -199,14 +219,38 @@ export class AdminStatsController {
         const cohortCount = (returning: boolean, active: boolean) =>
             Number(
                 cohorts.find(
-                    (row) => row.returning === returning && row.active === active,
+                    (row) =>
+                        row.returning === returning && row.active === active,
                 )?.count ?? 0,
             );
+
+        const clicks = clickRows
+            .filter((row) => row.isEventTotal)
+            .map((total) => ({
+                event: total.event,
+                clicks: Number(total.clicks),
+                users: Number(total.users),
+                sources: clickRows
+                    .filter(
+                        (row) =>
+                            !row.isEventTotal &&
+                            row.event === total.event &&
+                            row.source !== null,
+                    )
+                    .map((row) => ({
+                        source: row.source as string,
+                        clicks: Number(row.clicks),
+                        users: Number(row.users),
+                    }))
+                    .sort((a, b) => b.clicks - a.clicks),
+            }))
+            .sort((a, b) => b.clicks - a.clicks);
 
         return {
             status: 200,
             year,
             season,
+            clicks,
             openingsByDay: openingsByDay.map((row) => ({
                 day: row.key,
                 users: Number(row.users),

@@ -62,9 +62,19 @@ export interface DateCount {
     count: number;
 }
 
+export interface ClickCount {
+    clicks: number;
+    users: number; // distinct users
+}
+
 export interface Stats {
     year: number;
     season: Season;
+    // Whole year, most clicked first. Sources: clicks without one are left out.
+    clicks: (ClickCount & {
+        event: string;
+        sources: (ClickCount & { source: string })[];
+    })[];
     openingsByDay: { day: number; users: number }[];
     openingsByType: { type: ContentFamily; users: number }[] | null; // null for October: content openings aren't recorded.
     dayOpeners: {

@@ -7,6 +7,7 @@ import { ColumnChart } from "../components/stats/ColumnChart";
 import { PieChart } from "../components/stats/PieChart";
 import { DateChart, MonthlyDateChart } from "../components/stats/DateCharts";
 import { Kpi } from "../components/stats/Kpi";
+import { ClicksTable } from "../components/stats/ClicksTable";
 import { formatNumber, percent } from "../components/stats/statsFormat";
 import { Season, Stats } from "../types";
 
@@ -431,6 +432,11 @@ export function StatsPage() {
                                 <ColumnChart bars={challengeBars.byDay} />
                             </div>
                         )}
+
+                        <div id="clics">
+                            <h2>Clics ({year})</h2>
+                            <ClicksTable rows={stats.clicks} />
+                        </div>
 
                         <div id="nouveaux-membres">
                             <h2>Nouveaux membres</h2>

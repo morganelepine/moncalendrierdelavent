@@ -717,3 +717,86 @@ textarea.code {
     font-family: var(--font-code);
     font-size: 13px;
 }
+
+/* Clicks table: one row per action, its sources as indented rows. */
+.clicks-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-top: var(--space-xl);
+}
+
+.clicks-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    font-size: 14px;
+}
+
+.clicks-table th,
+.clicks-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--hairline);
+    text-align: left;
+}
+
+.clicks-table td,
+.clicks-table thead th:not(:first-child) {
+    text-align: center;
+}
+
+/* Fixed, not %: in an auto-layout table, % widths raise its minimum width
+   (the other column's min-content must fit in the remaining %). */
+.clicks-table thead th:not(:first-child) {
+    width: 4rem;
+}
+
+.clicks-table td {
+    font-family: var(--font-code);
+    white-space: nowrap;
+}
+
+.clicks-table thead th {
+    color: var(--charcoal);
+    font-size: 13px;
+}
+
+.clicks-table tbody th {
+    font-weight: 600;
+    /* Sources are free text (titles, ids) that may have no break point. */
+    overflow-wrap: anywhere;
+}
+
+.clicks-source th {
+    padding-left: var(--space-xxl);
+    font-weight: 400;
+    color: var(--mute);
+}
+
+.clicks-source td {
+    color: var(--mute);
+}
+
+@media (max-width: 640px) {
+    .clicks-table th,
+    .clicks-table td {
+        padding: var(--space-sm) var(--space-xs);
+    }
+
+    .clicks-source th {
+        padding-left: var(--space-lg);
+    }
+}
+
+.clicks-toggle {
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-xs);
+    background: none;
+    text-align: left;
+}
+
+.clicks-toggle:hover {
+    background: none;
+    text-decoration: underline;
+}
