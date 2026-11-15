@@ -19,6 +19,7 @@ interface PillTabBarProps {
     onSelect: (key: string) => void;
     variant?: "filled" | "outline";
     withBackgroundStrip?: boolean;
+    accessibilityLabel?: string;
 }
 
 export const PillTabBar: React.FC<PillTabBarProps> = ({
@@ -27,6 +28,7 @@ export const PillTabBar: React.FC<PillTabBarProps> = ({
     onSelect,
     variant = "filled",
     withBackgroundStrip = false,
+    accessibilityLabel,
 }) => {
     const isFilled = variant === "filled";
 
@@ -35,6 +37,7 @@ export const PillTabBar: React.FC<PillTabBarProps> = ({
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.container}
+            accessibilityLabel={accessibilityLabel}
         >
             {items.map((item) => {
                 const focused = item.key === activeKey;
@@ -42,6 +45,8 @@ export const PillTabBar: React.FC<PillTabBarProps> = ({
                     <Pressable
                         key={item.key}
                         onPress={() => onSelect(item.key)}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: focused }}
                         style={[
                             isFilled ? styles.pillFilled : styles.pillOutline,
                             focused &&

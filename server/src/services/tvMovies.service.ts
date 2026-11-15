@@ -27,7 +27,7 @@ const CHANNEL_NAMES: Record<string, string> = {
     "NT1.fr": "TFX",
     "CanalPlus.fr": "Canal+",
     "CanalPlusCinema.fr": "Canal+ Cinéma",
-    "Cherie25.fr": "Chérie 25",
+    "Cherie25.fr": "RMC Life",
 };
 
 const toChannelName = (channel: string): string =>

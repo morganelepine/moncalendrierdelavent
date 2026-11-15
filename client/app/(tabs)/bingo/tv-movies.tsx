@@ -2,14 +2,27 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlueBackground } from "@/components/utils/BlueBackground";
 import { ThemedText } from "@/components/ThemedText";
+import { PillTabBar, PillTabBarItem } from "@/components/navigation/PillTabBar";
 import { TvMovieImage } from "@/components/activities/TvMovieImage";
 import { TvMovieStatusBadge } from "@/components/activities/TvMovieStatusBadge";
 import { Colors } from "@/constants/Colors";
 import { NO_TOP_EDGES } from "@/constants/safeAreaEdges";
 import { useTvMoviesSchedule } from "@/hooks/useTvMoviesSchedule";
+import {
+    ALL,
+    SlotFilter,
+    useTvMoviesFilters,
+} from "@/hooks/useTvMoviesFilters";
 import { useCurrentMinutes } from "@/hooks/useCurrentMinutes";
 import { TvMovie } from "@/interfaces/tvMovieInterface";
 import { formatHour, isBetween } from "@/utils/hours";
+
+const SLOT_ITEMS: readonly PillTabBarItem[] = [
+    { key: ALL, label: "Toute la journée" },
+    { key: "morning", label: "Matin" },
+    { key: "afternoon", label: "Après-midi" },
+    { key: "evening", label: "Soir" },
+];
 
 const TvMovieCard: React.FC<{ movie: TvMovie; onAir: boolean }> = ({
     movie,
@@ -48,13 +61,90 @@ const TvMovieCard: React.FC<{ movie: TvMovie; onAir: boolean }> = ({
     );
 };
 
+interface TvMoviesListProps {
+    movies: TvMovie[] | null;
+    filteredMovies: TvMovie[];
+    error: boolean;
+    isTomorrow: boolean;
+    nowMinutes: number;
+}
+
+const TvMoviesList: React.FC<TvMoviesListProps> = ({
+    movies,
+    filteredMovies,
+    error,
+    isTomorrow,
+    nowMinutes,
+}) => {
+    if (error) {
+        return (
+            <ThemedText style={styles.message}>
+                Impossible de charger le programme, réessayez plus tard.
+            </ThemedText>
+        );
+    }
+    if (movies === null) {
+        return <ActivityIndicator size="large" color={Colors.snow} />;
+    }
+    if (movies.length === 0) {
+        return (
+            <ThemedText style={styles.message}>
+                {isTomorrow
+                    ? "Pas de téléfilm de Noël demain."
+                    : "Pas de téléfilm de Noël aujourd'hui, revenez demain !"}
+            </ThemedText>
+        );
+    }
+    if (filteredMovies.length === 0) {
+        return (
+            <ThemedText style={styles.message}>
+                Aucun téléfilm avec ces filtres.
+            </ThemedText>
+        );
+    }
+    return filteredMovies.map((movie) => (
+        <TvMovieCard
+            key={`${movie.channel}-${movie.startHour}`}
+            movie={movie}
+            onAir={
+                !isTomorrow &&
+                isBetween(nowMinutes, movie.startHour, movie.endHour)
+            }
+        />
+    ));
+};
+
 export default function TvMoviesScreen() {
     const { day, movies, error } = useTvMoviesSchedule();
     const nowMinutes = useCurrentMinutes();
     const isTomorrow = day === "tomorrow";
+    const { channelItems, channel, setChannel, slot, setSlot, filteredMovies } =
+        useTvMoviesFilters(movies, isTomorrow, nowMinutes);
+
+    const showFilters = !error && !!movies?.length;
 
     return (
         <BlueBackground>
+            {showFilters ? (
+                <View style={styles.filters}>
+                    {channelItems.length > 0 ? (
+                        <PillTabBar
+                            items={channelItems}
+                            activeKey={channel}
+                            onSelect={setChannel}
+                            variant="outline"
+                            accessibilityLabel="Filtrer par chaîne"
+                        />
+                    ) : null}
+                    <PillTabBar
+                        items={SLOT_ITEMS}
+                        activeKey={slot}
+                        onSelect={(key) => setSlot(key as SlotFilter)}
+                        variant="outline"
+                        accessibilityLabel="Filtrer par créneau"
+                    />
+                </View>
+            ) : null}
             <ScrollView contentContainerStyle={styles.container}>
                 <SafeAreaView edges={NO_TOP_EDGES} style={styles.list}>
                     {isTomorrow ? (
@@ -66,35 +156,13 @@ export default function TvMoviesScreen() {
                             programme demain :
                         </ThemedText>
                     ) : null}
-                    {error ? (
-                        <ThemedText style={styles.message}>
-                            Impossible de charger le programme, réessayez plus
-                            tard.
-                        </ThemedText>
-                    ) : movies === null ? (
-                        <ActivityIndicator size="large" color={Colors.snow} />
-                    ) : movies.length === 0 ? (
-                        <ThemedText style={styles.message}>
-                            {isTomorrow
-                                ? "Pas de téléfilm de Noël demain."
-                                : "Pas de téléfilm de Noël aujourd'hui, revenez demain !"}
-                        </ThemedText>
-                    ) : (
-                        movies.map((movie) => (
-                            <TvMovieCard
-                                key={`${movie.channel}-${movie.startHour}`}
-                                movie={movie}
-                                onAir={
-                                    !isTomorrow &&
-                                    isBetween(
-                                        nowMinutes,
-                                        movie.startHour,
-                                        movie.endHour,
-                                    )
-                                }
-                            />
-                        ))
-                    )}
+                    <TvMoviesList
+                        movies={movies}
+                        filteredMovies={filteredMovies}
+                        error={error}
+                        isTomorrow={isTomorrow}
+                        nowMinutes={nowMinutes}
+                    />
                 </SafeAreaView>
             </ScrollView>
         </BlueBackground>
@@ -102,6 +170,9 @@ export default function TvMoviesScreen() {
 }
 
 const styles = StyleSheet.create({
+    filters: {
+        paddingTop: 8,
+    },
     container: {
         paddingHorizontal: 20,
         paddingTop: 20,

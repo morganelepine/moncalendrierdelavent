@@ -18,6 +18,15 @@ export const isBetween = (
     endHour: string,
 ): boolean => minutes >= toMinutes(startHour) && minutes < toMinutes(endHour);
 
+export type DaySlot = "morning" | "afternoon" | "evening";
+
+export const getDaySlot = (hour: string): DaySlot => {
+    const minutes = toMinutes(hour);
+    if (minutes < 12 * 60) return "morning";
+    if (minutes < 18 * 60) return "afternoon";
+    return "evening";
+};
+
 // "01:13" -> "1h13", "14:25" -> "14h25"
 export const formatHour = (hour: string): string => {
     const [h, m] = hour.split(":");
