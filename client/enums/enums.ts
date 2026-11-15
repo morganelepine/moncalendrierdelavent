@@ -72,3 +72,39 @@ export enum ChristmasTargetDay {
     Eve = 24, // 24 décembre - réveillon
     Day = 25, // 25 décembre - default
 }
+
+// Stored as-is in ClickEvent.event (server checks /^[a-z0-9_]+$/).
+export enum TrackEvent {
+    // Sharing
+    CountdownShare = "countdown_share",
+    QuizShare = "quiz_share", // source: quiz title
+    QuizDownload = "quiz_download", // source: quiz title
+    RetrospectiveShare = "retrospective_share",
+    RetrospectiveDownload = "retrospective_download",
+
+    // Premium
+    PremiumOpen = "premium_open", // source: entry point
+    PremiumPurchase = "premium_purchase",
+
+    // External links
+    Instagram = "instagram",
+    Terms = "terms",
+    Privacy = "privacy",
+
+    // App updates
+    RecommendedUpdate = "recommended_update",
+    Announcement = "announcement", // source: announcement id
+
+    // Contents
+    RecoLink = "reco_link", // source: content title
+    ListRecoLink = "list_reco_link", // source: item title
+    AnecdoteSource = "anecdote_source", // source: anecdote title
+
+    // Day 25
+    Day25Retrospective = "day25_retrospective",
+    Day25Wallpaper = "day25_wallpaper", // source: wallpaper id
+    Day25Recipe = "day25_recipe", // source: recipe title
+    Day25Horoscope = "day25_horoscope",
+    Day25MimesTemplate = "day25_mimes_template",
+    Day25Bingo = "day25_bingo",
+}

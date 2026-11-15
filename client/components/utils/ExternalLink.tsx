@@ -7,13 +7,14 @@ type Props = Omit<ComponentProps<typeof Link>, "href"> & {
     href: Href;
 };
 
-export function ExternalLink({ href, ...rest }: Props) {
+export function ExternalLink({ href, onPress, ...rest }: Props) {
     return (
         <Link
             target="_blank"
             {...rest}
             href={href}
             onPress={async (event) => {
+                onPress?.(event);
                 if (Platform.OS !== "web") {
                     // Prevent the default behavior of linking to the default browser on native.
                     event.preventDefault();

@@ -4,10 +4,16 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { PRIVACY_URL, TERMS_URL } from "@/constants/Links";
 import { openExternalUrl } from "@/utils/openExternalUrl";
+import { TrackEvent } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
 
 const LEGAL_LINKS = [
-    { label: "Conditions d'utilisation", url: TERMS_URL },
-    { label: "Confidentialité", url: PRIVACY_URL },
+    {
+        label: "Conditions d'utilisation",
+        url: TERMS_URL,
+        event: TrackEvent.Terms,
+    },
+    { label: "Confidentialité", url: PRIVACY_URL, event: TrackEvent.Privacy },
 ];
 
 // Keeps these small links comfortable to tap without taking more room.
@@ -16,7 +22,7 @@ const LINK_HIT_SLOP = { top: 12, bottom: 12, left: 4, right: 4 };
 export const LegalLinks = () => {
     return (
         <View style={styles.links}>
-            {LEGAL_LINKS.map(({ label, url }, index) => (
+            {LEGAL_LINKS.map(({ label, url, event }, index) => (
                 <Fragment key={url}>
                     {index > 0 && (
                         <Text
@@ -30,7 +36,10 @@ export const LegalLinks = () => {
                     <Pressable
                         accessibilityRole="link"
                         hitSlop={LINK_HIT_SLOP}
-                        onPress={() => openExternalUrl(url)}
+                        onPress={() => {
+                            trackEvent(event);
+                            openExternalUrl(url);
+                        }}
                     >
                         <ThemedText style={styles.link}>{label}</ThemedText>
                     </Pressable>

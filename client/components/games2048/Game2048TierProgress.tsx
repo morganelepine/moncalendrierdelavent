@@ -1,12 +1,12 @@
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
-import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getIconForTier, getGame2048IconUrl } from "@/constants/game2048Icons";
 import { Colors } from "@/constants/Colors";
 import { PURCHASES_SUPPORTED } from "@/contexts/PremiumContext";
 import { MAX_TIER } from "@/utils/games2048/engine";
 import { showToast } from "@/components/utils/Toast";
+import { openPremiumScreen } from "@/services/tracking.service";
 
 interface Game2048TierProgressProps {
     // The highest tier this player can currently reach (see getMaxTier).
@@ -48,9 +48,7 @@ export const Game2048TierProgress = ({
                                         {
                                             label: "Découvrir",
                                             onPress: () =>
-                                                router.push(
-                                                    "/informations/premium",
-                                                ),
+                                                openPremiumScreen("2048_tier"),
                                         },
                                     )
                                 }

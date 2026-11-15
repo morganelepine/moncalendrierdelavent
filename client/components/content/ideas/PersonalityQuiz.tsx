@@ -21,7 +21,8 @@ import {
     computeProfile,
     parsePersonalityQuiz,
 } from "@/services/contents/personalityQuiz.service";
-import { ChallengeId } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
+import { ChallengeId, TrackEvent } from "@/enums/enums";
 
 interface PersonalityQuizProps {
     idea: Content;
@@ -122,6 +123,10 @@ export const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ idea }) => {
                         {isShareSupported && (
                             <Pressable
                                 onPress={async () => {
+                                    trackEvent(
+                                        TrackEvent.QuizShare,
+                                        idea.title,
+                                    );
                                     await shareView(
                                         shareCardRef,
                                         `J'ai fait le quiz "${idea.title}" et je suis "${profile.title}" ✨ et toi ?\nFais-le dans l'app Mon calendrier de l'avent : ${PLAY_STORE_URL}`,
@@ -143,6 +148,10 @@ export const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({ idea }) => {
                         {isViewDownloadSupported && (
                             <Pressable
                                 onPress={async () => {
+                                    trackEvent(
+                                        TrackEvent.QuizDownload,
+                                        idea.title,
+                                    );
                                     await downloadView(shareCardRef);
                                 }}
                                 style={styles.button}

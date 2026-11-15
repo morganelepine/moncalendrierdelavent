@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import { ModalWithCloseButton } from "@/components/utils/custom/ModalWithCloseButton";
 import { ThemedText } from "@/components/ThemedText";
 import { CustomButton } from "@/components/utils/buttons/Button";
@@ -6,6 +5,7 @@ import { useGoalForCurrentSeason } from "@/hooks/useGame2048";
 import { PURCHASES_SUPPORTED, usePremium } from "@/contexts/PremiumContext";
 import { MAX_TIER, FREE_MAX_TIER } from "@/utils/games2048/engine";
 import { Theme } from "@/constants/Colors";
+import { openPremiumScreen } from "@/services/tracking.service";
 
 interface Props {
     visible: boolean;
@@ -34,7 +34,7 @@ export const Game2048WinModal = ({ visible, onClose }: Props) => {
                         color={Theme.orangeToGreen}
                         onPress={() => {
                             onClose();
-                            router.push("/informations/premium");
+                            openPremiumScreen("2048_win");
                         }}
                     >
                         Découvrir la Hotte Magique

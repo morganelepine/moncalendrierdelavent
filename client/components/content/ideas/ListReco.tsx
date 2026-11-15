@@ -4,6 +4,8 @@ import { Href } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { ExternalLink } from "@/components/utils/ExternalLink";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
+import { trackEvent } from "@/services/tracking.service";
+import { TrackEvent } from "@/enums/enums";
 import { Theme } from "@/constants/Colors";
 import { ListOfContents } from "@/interfaces/contentInterface";
 
@@ -65,6 +67,9 @@ export const ListReco: React.FC<ListRecoProps> = ({
             {content.url && (
                 <ExternalLink
                     href={content.url as Href}
+                    onPress={() =>
+                        trackEvent(TrackEvent.ListRecoLink, content.title)
+                    }
                     style={styles.link}
                     accessibilityLabel={`Ouvrir ${content.title}`}
                 />

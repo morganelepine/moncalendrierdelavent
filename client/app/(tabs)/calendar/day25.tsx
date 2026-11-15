@@ -19,10 +19,13 @@ import { wallpapers } from "@/data/day-25-gifts/wallpapers_data";
 import { recipes } from "@/data/day-25-gifts/recipes_data";
 import { Retrospective } from "@/interfaces/retrospectiveInterface";
 import { getRetrospective } from "@/services/contents/retrospective.service";
+import { trackEvent } from "@/services/tracking.service";
+import { TrackEvent } from "@/enums/enums";
 
 export default function Day25Screen() {
     const [modalVisible, setModalVisible] = useState(false);
     const openStoryModal = async () => {
+        trackEvent(TrackEvent.Day25Horoscope);
         setModalVisible(true);
     };
     const [retrospective, setRetrospective] = useState<Retrospective | null>(
@@ -95,7 +98,10 @@ export default function Day25Screen() {
                         </ThemedText>
                         <CustomButton
                             style={styles.button}
-                            onPress={() => setRetrospectiveVisible(true)}
+                            onPress={() => {
+                                trackEvent(TrackEvent.Day25Retrospective);
+                                setRetrospectiveVisible(true);
+                            }}
                         >
                             Voir ma rétrospective
                         </CustomButton>
@@ -167,6 +173,9 @@ export default function Day25Screen() {
                             href={
                                 "https://www.canva.com/design/DAG5hYYr3HI/AteVoi3dLSFREp_nndmbGg/view?utm_content=DAG5hYYr3HI&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink&mode=preview"
                             }
+                            onPress={() =>
+                                trackEvent(TrackEvent.Day25MimesTemplate)
+                            }
                         >
                             <View style={styles.thumbnail}>
                                 <Image
@@ -205,6 +214,7 @@ export default function Day25Screen() {
                             href={
                                 "https://res.cloudinary.com/deauthz29/image/upload/v1732540131/bingo_blanc_rvflsz.png"
                             }
+                            onPress={() => trackEvent(TrackEvent.Day25Bingo)}
                         >
                             <View style={styles.thumbnail}>
                                 <Image

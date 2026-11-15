@@ -13,6 +13,7 @@ interface ExternalLinkButtonProps {
     url: string;
     style?: TextStyle;
     color?: string;
+    onPress?: () => void;
 }
 
 export const ExternalLinkButton: React.FC<ExternalLinkButtonProps> = ({
@@ -20,10 +21,12 @@ export const ExternalLinkButton: React.FC<ExternalLinkButtonProps> = ({
     url,
     style = {},
     color = Theme.autumnGreenDarkToautumnGreen,
+    onPress,
 }) => {
     return (
         <ExternalLink
             href={url as Href}
+            onPress={onPress}
             style={{ ...style, ...styles.button, backgroundColor: color }}
         >
             <ThemedText style={styles.buttonText}>{children}</ThemedText>{" "}

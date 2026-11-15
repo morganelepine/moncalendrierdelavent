@@ -31,7 +31,8 @@ import {
 import { COUNTDOWN_SHARE_BACKGROUNDS } from "@/constants/shareBackgrounds";
 import { isShareSupported } from "@/services/share.service";
 import { completeChallenge } from "@/services/challenge.service";
-import { ChallengeId } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
+import { ChallengeId, TrackEvent } from "@/enums/enums";
 import { AnnouncementModal } from "@/components/utils/AnnouncementModal";
 
 // BACKGROUND IMAGES
@@ -92,9 +93,10 @@ export const Home = () => {
                         onClose={() => setPickerVisible(false)}
                         backgrounds={shareBackgrounds}
                         message={shareMessage}
-                        onShared={() =>
-                            void completeChallenge(ChallengeId.ShareCountdown)
-                        }
+                        onShared={() => {
+                            trackEvent(TrackEvent.CountdownShare);
+                            void completeChallenge(ChallengeId.ShareCountdown);
+                        }}
                         contentPosition={isOctober ? "center" : "top"}
                     >
                         <HomeHeadline />

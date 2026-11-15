@@ -15,6 +15,8 @@ import { showToast } from "@/components/utils/Toast";
 import { Separator } from "@/components/utils/Separator";
 import { usePremium } from "@/contexts/PremiumContext";
 import { logClient } from "@/services/sentry.service";
+import { trackEvent } from "@/services/tracking.service";
+import { TrackEvent } from "@/enums/enums";
 import { Colors, Theme } from "@/constants/Colors";
 import { NO_TOP_EDGES } from "@/constants/safeAreaEdges";
 
@@ -30,6 +32,7 @@ export default function PremiumScreen() {
     const [restoring, setRestoring] = useState(false);
 
     const handlePurchase = async () => {
+        trackEvent(TrackEvent.PremiumPurchase);
         setPurchasing(true);
         try {
             await purchasePremium();

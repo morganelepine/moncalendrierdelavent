@@ -6,14 +6,59 @@ import { ExternalLinkButton } from "@/components/utils/buttons/ExternalLinkButto
 import { AudioPlayer } from "@/components/content/Audio";
 import { Colors } from "@/constants/Colors";
 import { Content } from "@/interfaces/contentInterface";
-import { IdeaType } from "@/enums/enums";
+import { IdeaType, TrackEvent } from "@/enums/enums";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
+import { trackEvent } from "@/services/tracking.service";
 
 interface RecoProps {
     idea: Content;
 }
 
 export const Reco: React.FC<RecoProps> = ({ idea }) => {
+    let mediaContent: React.ReactNode = null;
+
+    if (idea.media) {
+        if (idea.content4 === IdeaType.Game) {
+            mediaContent = (
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={{ uri: getCloudinaryImageUrl(idea.media) }}
+                        style={styles.image}
+                        contentFit="cover"
+                        cachePolicy="memory-disk"
+                    />
+                </View>
+            );
+        } else if (idea.content4 === IdeaType.Audio) {
+            mediaContent = (
+                <>
+                    <AudioPlayer
+                        music={idea.media}
+                        type="button"
+                        style={{ marginVertical: 16 }}
+                    />
+                    {idea.content3 && (
+                        <ThemedText
+                            type="italic14"
+                            style={{ marginVertical: 12 }}
+                        >
+                            {idea.content3}
+                        </ThemedText>
+                    )}
+                </>
+            );
+        } else {
+            mediaContent = (
+                <ExternalLinkButton
+                    url={idea.media}
+                    onPress={() => trackEvent(TrackEvent.RecoLink, idea.title)}
+                >
+                    {idea.content3}
+                </ExternalLinkButton>
+            );
+        }
+    }
+
     return (
         <View>
             <ThemedText type="contentSubtitle">{idea.title}</ThemedText>
@@ -27,39 +72,7 @@ export const Reco: React.FC<RecoProps> = ({ idea }) => {
             <CustomMarkdown>{idea.content1}</CustomMarkdown>
 
             {/* IMAGE OR AUDIO OR BUTTON */}
-            {idea.media &&
-                (idea.content4 === IdeaType.Game ? (
-                    <View style={styles.imageContainer}>
-                        <Image
-                            source={{
-                                uri: getCloudinaryImageUrl(idea.media ?? ""),
-                            }}
-                            style={styles.image}
-                            contentFit="cover"
-                            cachePolicy="memory-disk"
-                        />
-                    </View>
-                ) : idea.content4 === IdeaType.Audio ? (
-                    <>
-                        <AudioPlayer
-                            music={idea.media}
-                            type="button"
-                            style={{ marginVertical: 16 }}
-                        />
-                        {idea.content3 && (
-                            <ThemedText
-                                type="italic14"
-                                style={{ marginVertical: 12 }}
-                            >
-                                {idea.content3}
-                            </ThemedText>
-                        )}
-                    </>
-                ) : (
-                    <ExternalLinkButton url={idea.media}>
-                        {idea.content3}
-                    </ExternalLinkButton>
-                ))}
+            {mediaContent}
         </View>
     );
 };

@@ -111,6 +111,20 @@ model Announcement {
   createdAt   DateTime @default(now())
 }
 
+// Clicks tracked from the app (shares, premium, external links...).
+// No relation to User: inserts must stay a single cheap write.
+model ClickEvent {
+  id         Int      @id @default(autoincrement())
+  event      String
+  source     String? // e.g. which entry point, content title or announcement id
+  userUuid   String
+  platform   String
+  appVersion String?
+  createdAt  DateTime @default(now())
+
+  @@index([event, createdAt])
+}
+
 model Group {
   id        Int           @id @default(autoincrement())
   name      String

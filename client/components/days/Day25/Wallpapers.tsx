@@ -3,9 +3,11 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
 import { downloadImage } from "@/services/download.service";
+import { trackEvent } from "@/services/tracking.service";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { WallpaperData } from "@/interfaces/contentInterface";
+import { TrackEvent } from "@/enums/enums";
 
 interface WallpapersProps {
     datas: WallpaperData[];
@@ -18,6 +20,11 @@ export const Wallpapers: React.FC<WallpapersProps> = ({ datas, type }) => {
     >(null);
 
     const download = async (data: WallpaperData): Promise<void> => {
+        if (type === "wallpapers") {
+            trackEvent(TrackEvent.Day25Wallpaper, String(data.id));
+        } else {
+            trackEvent(TrackEvent.Day25Recipe, data.title);
+        }
         setDownloadingId(data.id);
         await downloadImage(data.image);
         setDownloadingId(null);

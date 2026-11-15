@@ -5,6 +5,8 @@ import { ModalWithCloseButton } from "@/components/utils/custom/ModalWithCloseBu
 import { openExternalUrl } from "@/utils/openExternalUrl";
 import { Theme } from "@/constants/Colors";
 import { PLAY_STORE_URL } from "@/constants/Links";
+import { TrackEvent } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
 
 const DEFAULT_MESSAGE =
     "Les lutins ont glissé de nouvelles surprises dans l’application : mettez-la à jour pour en profiter ✨";
@@ -29,6 +31,7 @@ export const RecommendedUpdateModal = ({
             <CustomButton
                 color={Theme.orangeToGreen}
                 onPress={() => {
+                    trackEvent(TrackEvent.RecommendedUpdate);
                     openExternalUrl(PLAY_STORE_URL);
                     onClose();
                 }}

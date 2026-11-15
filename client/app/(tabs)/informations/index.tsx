@@ -10,7 +10,8 @@ import { INSTAGRAM_URL } from "@/constants/Links";
 import { TEST_TOOLS_ENABLED } from "@/constants/testTools";
 import { useUser } from "@/contexts/UserContext";
 import { PURCHASES_SUPPORTED } from "@/contexts/PremiumContext";
-import { ChallengeId } from "@/enums/enums";
+import { ChallengeId, TrackEvent } from "@/enums/enums";
+import { openPremiumScreen, trackEvent } from "@/services/tracking.service";
 import { completeChallenge } from "@/services/challenge.service";
 import { openExternalUrl } from "@/utils/openExternalUrl";
 
@@ -40,7 +41,7 @@ export default function InformationsScreen() {
                             iconColor={
                                 isOctober ? Colors.autumnGold : Colors.lightBlue
                             }
-                            onPress={() => router.push("/informations/premium")}
+                            onPress={() => openPremiumScreen("informations")}
                         />
                     )}
 
@@ -87,6 +88,7 @@ export default function InformationsScreen() {
                         iconColor={isOctober ? Colors.autumnRed : Colors.green}
                         onPress={() => {
                             void completeChallenge(ChallengeId.FollowInstagram);
+                            trackEvent(TrackEvent.Instagram);
                             openExternalUrl(INSTAGRAM_URL);
                         }}
                     />

@@ -49,13 +49,21 @@ const toEndpoint = (path: string): string =>
 type ApiFetchOptions = Omit<RequestInit, "body"> & {
     body?: unknown;
     timeoutMs?: number;
+    // Skips Sentry reporting, for best-effort calls (e.g. click tracking).
+    silent?: boolean;
 };
 
 export async function apiFetch<T>(
     path: string,
     options: ApiFetchOptions = {},
 ): Promise<T> {
-    const { timeoutMs = 10000, body, headers, ...rest } = options;
+    const {
+        timeoutMs = 10000,
+        body,
+        headers,
+        silent = false,
+        ...rest
+    } = options;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -87,6 +95,8 @@ export async function apiFetch<T>(
         } else {
             apiError = new ApiError(0, "", `Network error: ${String(error)}`);
         }
+
+        if (silent) throw apiError;
 
         // “Expected” 4xx errors (404, 409...) are treated as warnings;
         // the rest (5xx, network, timeout) are treated as actual errors.

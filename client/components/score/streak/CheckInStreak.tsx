@@ -6,7 +6,6 @@ import {
     StyleSheet,
     View,
 } from "react-native";
-import { router } from "expo-router";
 import { usePremium } from "@/contexts/PremiumContext";
 import { ThemedText } from "@/components/ThemedText";
 import { showPointsToast, showToast } from "@/components/utils/Toast";
@@ -27,6 +26,7 @@ import {
 } from "@/constants/checkIn";
 import { Score } from "@/interfaces/scoreInterface";
 import { checkIn, spendCheckInJoker } from "@/services/score.service";
+import { openPremiumScreen } from "@/services/tracking.service";
 
 const DAYS = Array.from({ length: CHECK_IN_LAST_DAY }, (_, i) => i + 1);
 const MISSED_MESSAGE = "La boule a été rangée dans le carton...";
@@ -112,7 +112,7 @@ export const CheckInStreak: React.FC<CheckInStreakProps> = ({
         if (jokersLeft === null) {
             showToast(MISSED_MESSAGE, "long", {
                 label: "Besoin d'une boule bonus ?",
-                onPress: () => router.push("/informations/premium"),
+                onPress: () => openPremiumScreen("streak"),
             });
             return false;
         }

@@ -7,6 +7,8 @@ import { ExternalLink } from "@/components/utils/ExternalLink";
 import { Video } from "@/components/utils/custom/Video";
 import { useDayContents } from "@/hooks/useDayContents";
 import { isOctober } from "@/constants/Dates";
+import { TrackEvent } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
 
 export default function AnecdoteScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,6 +43,9 @@ export default function AnecdoteScreen() {
             {anecdote.content2 ? (
                 <ExternalLink
                     href={anecdote.content3 as Href}
+                    onPress={() =>
+                        trackEvent(TrackEvent.AnecdoteSource, anecdote.title)
+                    }
                     style={{ marginTop: 10 }}
                 >
                     <ThemedText type="italic14">

@@ -5,6 +5,8 @@ import { CustomButton } from "@/components/utils/buttons/Button";
 import { CenteredModal } from "@/components/utils/custom/CenteredModal";
 import { openExternalUrl } from "@/utils/openExternalUrl";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
+import { TrackEvent } from "@/enums/enums";
+import { trackEvent } from "@/services/tracking.service";
 
 export const AnnouncementModal = () => {
     const { announcement, dismiss } = useAnnouncement();
@@ -27,6 +29,7 @@ export const AnnouncementModal = () => {
                 color={Colors.gold}
                 textColor={Colors.blue}
                 onPress={() => {
+                    trackEvent(TrackEvent.Announcement, announcement.id);
                     openExternalUrl(announcement.url);
                     dismiss();
                 }}

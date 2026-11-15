@@ -26,6 +26,8 @@ import {
     isViewDownloadSupported,
 } from "@/services/download.service";
 import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
+import { trackEvent } from "@/services/tracking.service";
+import { TrackEvent } from "@/enums/enums";
 
 // Header + footer buttons around the recap card preview.
 const RECAP_RESERVED_HEIGHT = 240;
@@ -86,12 +88,14 @@ export const RetrospectiveStory: React.FC<RetrospectiveStoryProps> = ({
 
     // The on-screen preview is the captured card: one background only, no picker.
     const shareRecap = async (): Promise<void> => {
+        trackEvent(TrackEvent.RetrospectiveShare);
         setSharing(true);
         await shareView(recapCardRef, shareMessage, "story");
         setSharing(false);
     };
 
     const downloadRecap = async (): Promise<void> => {
+        trackEvent(TrackEvent.RetrospectiveDownload);
         setDownloading(true);
         await downloadView(recapCardRef, "story");
         setDownloading(false);
