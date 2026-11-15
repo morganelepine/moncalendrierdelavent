@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Image } from "expo-image";
 import { apiFetch } from "@/services/apiFetch";
 import {
     isChristmasSeason,
@@ -52,13 +51,6 @@ const getTvMovies = (date: string): Promise<TvMovie[]> => {
                         JSON.stringify(cached),
                     ).catch(() => {});
                 }
-                // So thumbnails show with the text instead of after it.
-                void Image.prefetch(
-                    movies.flatMap((movie) =>
-                        movie.image ? [movie.image] : [],
-                    ),
-                    "memory-disk",
-                );
                 return movies;
             })
             .catch((error) => {

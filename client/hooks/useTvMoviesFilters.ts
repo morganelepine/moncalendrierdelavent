@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { PillTabBarItem } from "@/components/navigation/PillTabBar";
 import { TvMovie } from "@/interfaces/tvMovieInterface";
-import { DaySlot, getDaySlot, toMinutes } from "@/utils/hours";
+import { DaySlot, getDaySlot, toEndMinutes } from "@/utils/hours";
 
 export const ALL = "all";
 export type SlotFilter = DaySlot | typeof ALL;
@@ -24,7 +24,7 @@ const getDefaultSlot = (
 ): SlotFilter => {
     if (isTomorrow) return ALL;
     const nextMovie = movies?.find(
-        (movie) => toMinutes(movie.endHour) > nowMinutes,
+        (movie) => toEndMinutes(movie.startHour, movie.endHour) > nowMinutes,
     );
     const nextSlot = nextMovie ? getDaySlot(nextMovie.startHour) : "morning";
     return nextSlot === "morning" ? ALL : nextSlot;

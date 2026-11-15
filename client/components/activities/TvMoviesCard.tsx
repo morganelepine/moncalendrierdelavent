@@ -17,7 +17,7 @@ import { TvMovie } from "@/interfaces/tvMovieInterface";
 import { completeChallenge } from "@/services/challenge.service";
 import { TvMoviesDay } from "@/hooks/useTvMoviesSchedule";
 import { useCurrentMinutes } from "@/hooks/useCurrentMinutes";
-import { formatHour, toMinutes } from "@/utils/hours";
+import { formatHour, toEndMinutes, toMinutes } from "@/utils/hours";
 
 interface FeaturedMovie {
     movie: TvMovie;
@@ -51,7 +51,7 @@ const getFeaturedMovie = (
     const timed: TimedMovie[] = movies.map((movie) => ({
         movie,
         start: toMinutes(movie.startHour),
-        end: toMinutes(movie.endHour),
+        end: toEndMinutes(movie.startHour, movie.endHour),
     }));
 
     const [live] = timed

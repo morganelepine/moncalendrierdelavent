@@ -7,7 +7,7 @@ import {
 } from "@/services/activities/tvMovies.service";
 import { useCurrentMinutes } from "@/hooks/useCurrentMinutes";
 import { TvMovie } from "@/interfaces/tvMovieInterface";
-import { toMinutes } from "@/utils/hours";
+import { toEndMinutes } from "@/utils/hours";
 
 export type TvMoviesDay = "today" | "tomorrow";
 
@@ -32,11 +32,13 @@ export const useTvMoviesSchedule = (): TvMoviesSchedule => {
 
         // Today's cached schedule first, for an instant render;
         // never over fresher data if the network answered first.
-        getCachedTodayTvMovies().then((cached) => {
-            if (!cancelled && cached) {
-                setToday((current) => current ?? cached);
-            }
-        });
+        getCachedTodayTvMovies()
+            .then((cached) => {
+                if (!cancelled && cached) {
+                    setToday((current) => current ?? cached);
+                }
+            })
+            .catch(() => undefined);
 
         getTodayTvMovies()
             .then((result) => {
@@ -53,8 +55,11 @@ export const useTvMoviesSchedule = (): TvMoviesSchedule => {
 
     const isTodayOver =
         isTvMoviesSeason &&
-        today !== null &&
-        today.every((movie) => toMinutes(movie.endHour) <= nowMinutes);
+        (today?.every(
+            (movie) =>
+                toEndMinutes(movie.startHour, movie.endHour) <= nowMinutes,
+        ) ??
+            false);
 
     useEffect(() => {
         if (!isTodayOver) return undefined;

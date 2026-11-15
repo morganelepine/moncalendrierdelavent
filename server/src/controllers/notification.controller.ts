@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { sendExpoPushNotifications } from "../services/expoPush.service";
 import { isCronRequest } from "../lib/cronAuth";
 import { isReminderSlot, ReminderSlot } from "../lib/reminderSlot";
+import { getParisNow } from "../lib/parisTime";
 
 type Season = "halloween" | "christmas";
 
@@ -10,12 +11,6 @@ type Season = "halloween" | "christmas";
 // lands on the right slot: the crons fire at 7/8h and 16/17h UTC.
 function getCurrentSlot(): ReminderSlot {
     return new Date().getUTCHours() < 12 ? "morning" : "evening";
-}
-
-function getParisNow(): Date {
-    return new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Europe/Paris" }),
-    );
 }
 
 function getActiveSeason(parisNow: Date): Season | null {
