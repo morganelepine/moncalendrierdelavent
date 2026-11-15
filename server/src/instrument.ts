@@ -19,4 +19,12 @@ Sentry.init({
     // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
     // We recommend adjusting this value in production, or using tracesSampler for finer control
     tracesSampleRate: 0.2,
+
+    // Prisma internal spans add noise and quota usage; detect_platform/load_engine also
+    // report bogus multi-minute durations when Vercel freezes the function mid-span.
+    // Leaf spans only, so the SQL span keeps its prisma:client:operation parent.
+    ignoreSpans: [
+        /^prisma:client:(detect_platform|load_engine|serialize)$/,
+        /^prisma:engine:(serialize|response_json_serialization)$/,
+    ],
 });

@@ -3,6 +3,7 @@
 
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 
-const config = getSentryExpoConfig(__dirname);
+// Session Replay isn't used: dropping its packages saves ~150 KB of bundle.
+const config = getSentryExpoConfig(__dirname, { includeWebReplay: false });
 
 module.exports = config;
