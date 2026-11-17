@@ -1,4 +1,11 @@
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { useRef } from "react";
+import {
+    ActivityIndicator,
+    LayoutChangeEvent,
+    ScrollView,
+    StyleSheet,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlueBackground } from "@/components/utils/BlueBackground";
 import { ThemedText } from "@/components/ThemedText";
@@ -15,7 +22,7 @@ import {
 } from "@/hooks/useTvMoviesFilters";
 import { useCurrentMinutes } from "@/hooks/useCurrentMinutes";
 import { TvMovie } from "@/interfaces/tvMovieInterface";
-import { formatHour, isBetween } from "@/utils/hours";
+import { formatHour, isBetween, toEndMinutes } from "@/utils/hours";
 
 const SLOT_ITEMS: readonly PillTabBarItem[] = [
     { key: ALL, label: "Toute la journée" },
@@ -24,15 +31,25 @@ const SLOT_ITEMS: readonly PillTabBarItem[] = [
     { key: "evening", label: "Soir" },
 ];
 
-const TvMovieCard: React.FC<{ movie: TvMovie; onAir: boolean }> = ({
+interface TvMovieCardProps {
+    movie: TvMovie;
+    onAir: boolean;
+    onLayout?: (event: LayoutChangeEvent) => void;
+}
+
+const TvMovieCard: React.FC<TvMovieCardProps> = ({
     movie,
     onAir,
+    onLayout,
 }) => {
     const startHour = formatHour(movie.startHour);
     const endHour = formatHour(movie.endHour);
 
     return (
-        <View style={[styles.card, onAir && styles.onAirCard]}>
+        <View
+            style={[styles.card, onAir && styles.onAirCard]}
+            onLayout={onLayout}
+        >
             {onAir ? <TvMovieStatusBadge status="live" /> : null}
             <View style={[styles.header, { marginTop: onAir ? 10 : 0 }]}>
                 <TvMovieImage uri={movie.image} />
@@ -52,11 +69,11 @@ const TvMovieCard: React.FC<{ movie: TvMovie; onAir: boolean }> = ({
             <ThemedText style={styles.title} accessibilityRole="header">
                 {movie.title}
             </ThemedText>
-            {movie.description && (
+            {movie.description ? (
                 <ThemedText style={styles.description}>
                     {movie.description}
                 </ThemedText>
-            )}
+            ) : null}
         </View>
     );
 };
@@ -67,6 +84,7 @@ interface TvMoviesListProps {
     error: boolean;
     isTomorrow: boolean;
     nowMinutes: number;
+    onAnchorLayout: (event: LayoutChangeEvent) => void;
 }
 
 const TvMoviesList: React.FC<TvMoviesListProps> = ({
@@ -75,6 +93,7 @@ const TvMoviesList: React.FC<TvMoviesListProps> = ({
     error,
     isTomorrow,
     nowMinutes,
+    onAnchorLayout,
 }) => {
     if (error) {
         return (
@@ -102,7 +121,14 @@ const TvMoviesList: React.FC<TvMoviesListProps> = ({
             </ThemedText>
         );
     }
-    return filteredMovies.map((movie) => (
+    // The first movie not over yet: on air, else the next one.
+    const anchorIndex = isTomorrow
+        ? -1
+        : filteredMovies.findIndex(
+              (movie) =>
+                  toEndMinutes(movie.startHour, movie.endHour) > nowMinutes,
+          );
+    return filteredMovies.map((movie, index) => (
         <TvMovieCard
             key={`${movie.channel}-${movie.startHour}`}
             movie={movie}
@@ -110,6 +136,7 @@ const TvMoviesList: React.FC<TvMoviesListProps> = ({
                 !isTomorrow &&
                 isBetween(nowMinutes, movie.startHour, movie.endHour)
             }
+            onLayout={index === anchorIndex ? onAnchorLayout : undefined}
         />
     ));
 };
@@ -119,7 +146,21 @@ export default function TvMoviesScreen() {
     const nowMinutes = useCurrentMinutes();
     const isTomorrow = day === "tomorrow";
     const { channelItems, channel, setChannel, slot, setSlot, filteredMovies } =
-        useTvMoviesFilters(movies, isTomorrow, nowMinutes);
+        useTvMoviesFilters(movies);
+
+    // Once, on opening: the movies already over stay above, a scroll away.
+    const scrollRef = useRef<ScrollView>(null);
+    const hasScrolledToAnchor = useRef(false);
+    const scrollToAnchor = (event: LayoutChangeEvent): void => {
+        if (hasScrolledToAnchor.current) return;
+        hasScrolledToAnchor.current = true;
+        // Relative to the list, which starts below the container's top
+        // padding: that padding is kept above the card.
+        scrollRef.current?.scrollTo({
+            y: event.nativeEvent.layout.y,
+            animated: true,
+        });
+    };
 
     const showFilters = !error && !!movies?.length;
 
@@ -145,7 +186,10 @@ export default function TvMoviesScreen() {
                     />
                 </View>
             ) : null}
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView
+                ref={scrollRef}
+                contentContainerStyle={styles.container}
+            >
                 <SafeAreaView edges={NO_TOP_EDGES} style={styles.list}>
                     {isTomorrow ? (
                         <ThemedText
@@ -162,6 +206,7 @@ export default function TvMoviesScreen() {
                         error={error}
                         isTomorrow={isTomorrow}
                         nowMinutes={nowMinutes}
+                        onAnchorLayout={scrollToAnchor}
                     />
                 </SafeAreaView>
             </ScrollView>
@@ -171,11 +216,11 @@ export default function TvMoviesScreen() {
 
 const styles = StyleSheet.create({
     filters: {
-        paddingTop: 8,
+        paddingVertical: 8,
     },
     container: {
         paddingHorizontal: 20,
-        paddingTop: 20,
+        paddingTop: 12,
     },
     list: {
         gap: 16,
