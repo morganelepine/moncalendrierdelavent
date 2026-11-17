@@ -84,7 +84,6 @@ export const Quiz: React.FC<QuizProps> = ({ content, setScore }) => {
                 <QuizExplanation
                     correctAnswer={currentQuestion.correctAnswer || ""}
                     explanation={currentQuestion.description}
-                    videoId={currentQuestion.url}
                     selectedAnswer={selectedAnswer}
                     totalQuestions={questions.length}
                     currentQuestionIndex={currentQuestionIndex}

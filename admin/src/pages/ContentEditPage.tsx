@@ -12,7 +12,7 @@ import {
     updateContent,
 } from "../services/contents.service";
 import {
-    CONTENT_FIELD_LABELS,
+    getContentFieldLabels,
     SUBTYPES_BY_TYPE,
 } from "../constants/contentSubtypes";
 import {
@@ -179,7 +179,7 @@ export function ContentEditPage() {
 
     if (loading) return <p className="loading">Ho ho ho...</p>;
 
-    const labels = CONTENT_FIELD_LABELS[form.type];
+    const labels = getContentFieldLabels(form.type, form.subType);
     const quizError = isPersonalityQuiz
         ? validatePersonalityQuiz(form.content1)
         : null;
@@ -328,47 +328,67 @@ export function ContentEditPage() {
                             ⚠ {warning}
                         </p>
                     ))}
-                <label>
-                    {labels[1]}
-                    <textarea
-                        rows={3}
-                        value={form.content2}
-                        onChange={(e) =>
-                            setForm((f) => ({ ...f, content2: e.target.value }))
-                        }
-                    />
-                </label>
-                <label>
-                    {labels[2]}
-                    <textarea
-                        rows={2}
-                        value={form.content3}
-                        onChange={(e) =>
-                            setForm((f) => ({ ...f, content3: e.target.value }))
-                        }
-                    />
-                </label>
-                <label>
-                    {labels[3]}
-                    <textarea
-                        rows={2}
-                        value={form.content4}
-                        onChange={(e) =>
-                            setForm((f) => ({ ...f, content4: e.target.value }))
-                        }
-                    />
-                </label>
+                {labels[1] && (
+                    <label>
+                        {labels[1]}
+                        <textarea
+                            rows={3}
+                            value={form.content2}
+                            onChange={(e) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    content2: e.target.value,
+                                }))
+                            }
+                        />
+                    </label>
+                )}
+                {labels[2] && (
+                    <label>
+                        {labels[2]}
+                        <textarea
+                            rows={2}
+                            value={form.content3}
+                            onChange={(e) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    content3: e.target.value,
+                                }))
+                            }
+                        />
+                    </label>
+                )}
+                {labels[3] && (
+                    <label>
+                        {labels[3]}
+                        <textarea
+                            rows={2}
+                            value={form.content4}
+                            onChange={(e) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    content4: e.target.value,
+                                }))
+                            }
+                        />
+                    </label>
+                )}
 
-                <label>
-                    Média (id Cloudinary)
-                    <input
-                        type="text"
-                        value={form.media}
-                        onChange={(e) =>
-                            setForm((f) => ({ ...f, media: e.target.value }))
-                        }
-                    />
-                </label>
+                {form.type !== "game" && (
+                    <label>
+                        Média (id Cloudinary)
+                        <input
+                            type="text"
+                            value={form.media}
+                            onChange={(e) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    media: e.target.value,
+                                }))
+                            }
+                        />
+                    </label>
+                )}
 
                 <fieldset className="years">
                     <legend>Années de publication</legend>
@@ -505,23 +525,18 @@ export function ContentEditPage() {
                                                 })
                                             }
                                         />
+                                        <input
+                                            type="text"
+                                            placeholder="Lien (URL)"
+                                            value={item.url}
+                                            onChange={(e) =>
+                                                updateListItem(index, {
+                                                    url: e.target.value,
+                                                })
+                                            }
+                                        />
                                     </>
                                 )}
-
-                                <input
-                                    type="text"
-                                    placeholder={
-                                        isQuizList
-                                            ? "ID vidéo YouTube (quiz citation uniquement)"
-                                            : "ID vidéo"
-                                    }
-                                    value={item.url}
-                                    onChange={(e) =>
-                                        updateListItem(index, {
-                                            url: e.target.value,
-                                        })
-                                    }
-                                />
                             </div>
                         ))}
                         <button type="button" onClick={addListItem}>

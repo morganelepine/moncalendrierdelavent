@@ -1,6 +1,7 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { ThemedText } from "@/components/ThemedText";
-import { Video } from "@/components/utils/custom/Video";
+import { getCloudinaryImageUrl } from "@/services/cloudinary.service";
 import { ListOfContents } from "@/interfaces/contentInterface";
 
 export const ListVideo = (content: ListOfContents) => {
@@ -12,10 +13,16 @@ export const ListVideo = (content: ListOfContents) => {
                 <ThemedText style={styles.author}>{content.author}</ThemedText>
             )}
 
-            {content.url && (
-                <View style={styles.videoContainer}>
-                    <Video videoId={content.url} />
-                </View>
+            {content.image && (
+                <Image
+                    source={{
+                        uri: getCloudinaryImageUrl(content.image),
+                    }}
+                    style={styles.image}
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
+                    accessibilityLabel={content.title}
+                />
             )}
 
             <ThemedText style={styles.description}>
@@ -34,8 +41,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginTop: -6,
     },
-    videoContainer: {
-        marginTop: 20,
+    image: {
+        marginVertical: 20,
+        width: "100%",
+        aspectRatio: 16 / 9,
+        borderRadius: 8,
     },
     description: { fontSize: 15 },
 });

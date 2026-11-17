@@ -15,33 +15,39 @@ export const SUBTYPES_BY_TYPE: Record<ContentFamily, string[]> = {
     story: ["story", "article"],
 };
 
-// content1-4 mean different things per family.
-export const CONTENT_FIELD_LABELS: Record<
-    ContentFamily,
-    [string, string, string, string]
-> = {
-    anecdote: [
-        "Texte",
-        "Nom de la source",
-        "URL de la source",
-        "ID vidéo YouTube (optionnel)",
-    ],
+type ContentFieldLabels = [string, string | null, string | null, string | null];
+
+// content1-4 mean different things per family; null hides an unused field.
+const CONTENT_FIELD_LABELS: Record<ContentFamily, ContentFieldLabels> = {
+    anecdote: ["Texte", "Nom de la source", "URL de la source", null],
     idea: [
         "Texte / intro",
         "Détails (ex. ingrédients pour une recette, règles d'un jeu...)",
         "Source / crédit photo",
         "Sous-catégorie (ex. book, video, recipe, creator)",
     ],
-    game: [
-        "Question / indices",
-        "Réponses (séparées par des virgules pour les quiz)",
-        "Bonne réponse (pour les quiz — laisser vide sinon)",
-        "Explication ou ID vidéo YouTube",
-    ],
+    game: ["Mots à trouver", null, null, null],
     story: [
         "Teaser (uniquement pour les articles)",
         "Texte / corps du chapitre",
         'Marqueur "end" (fin de chapitre — laisser vide sinon)',
         "Image (uniquement pour les articles)",
     ],
+};
+
+// The letters game ("jeu") is the only game still reading content2.
+export const getContentFieldLabels = (
+    type: ContentFamily,
+    subType: string,
+): ContentFieldLabels => {
+    const labels = CONTENT_FIELD_LABELS[type];
+    if (type === "game" && subType === "jeu") {
+        return [
+            labels[0],
+            "Réponses (dans l'ordre, séparées par des virgules)",
+            labels[2],
+            labels[3],
+        ];
+    }
+    return labels;
 };

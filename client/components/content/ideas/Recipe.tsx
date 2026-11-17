@@ -12,6 +12,13 @@ export const Recipe: React.FC<RecipeProps> = ({ content }) => {
     return (
         <View>
             <ThemedText type="contentSubtitle">{content.title}</ThemedText>
+            {content.content4 && (
+                <View style={styles.introContainer}>
+                    <ThemedText style={styles.intro}>
+                        {content.content4}
+                    </ThemedText>
+                </View>
+            )}
 
             <View>
                 <ThemedText style={styles.subtitle}>Ingrédients</ThemedText>
@@ -35,6 +42,19 @@ export const Recipe: React.FC<RecipeProps> = ({ content }) => {
 };
 
 const styles = StyleSheet.create({
+    introContainer: {
+        marginBottom: 16,
+        borderRadius: 16,
+        paddingVertical: 4,
+        paddingHorizontal: 12,
+        backgroundColor: Colors.goldLight,
+    },
+    intro: {
+        fontSize: 14,
+        fontFamily: "PoppinsItalic",
+        color: Colors.green,
+        textAlign: "center",
+    },
     subtitle: {
         fontFamily: "FreightNeoBold",
         marginBottom: 10,

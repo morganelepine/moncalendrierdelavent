@@ -1,12 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { Video } from "@/components/utils/custom/Video";
 import { NextQuestion } from "@/components/content/games/util/NextQuestion";
 
 interface QuizExplanationProps {
     correctAnswer: string;
     explanation?: string;
-    videoId?: string;
     selectedAnswer: string;
     totalQuestions: number;
     currentQuestionIndex: number;
@@ -16,7 +14,6 @@ interface QuizExplanationProps {
 export const QuizExplanation: React.FC<QuizExplanationProps> = ({
     correctAnswer,
     explanation,
-    videoId,
     selectedAnswer,
     totalQuestions,
     currentQuestionIndex,
@@ -36,12 +33,6 @@ export const QuizExplanation: React.FC<QuizExplanationProps> = ({
                         {explanation}
                     </ThemedText>
                 ) : null}
-
-                {videoId ? (
-                    <View style={styles.videoContainer}>
-                        <Video videoId={videoId} />
-                    </View>
-                ) : null}
             </View>
 
             <NextQuestion
@@ -60,5 +51,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: "left",
     },
-    videoContainer: { marginTop: 10 },
 });

@@ -1,10 +1,8 @@
 import { Href, useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ContentScreenWrapper } from "@/components/utils/custom/ContentScreenWrapper";
 import { CustomMarkdown } from "@/components/utils/custom/Markdown";
 import { ExternalLink } from "@/components/utils/ExternalLink";
-import { Video } from "@/components/utils/custom/Video";
 import { useDayContents } from "@/hooks/useDayContents";
 import { isOctober } from "@/constants/Dates";
 import { TrackEvent } from "@/enums/enums";
@@ -33,12 +31,6 @@ export default function AnecdoteScreen() {
             <ThemedText type="contentSubtitle">{anecdote.title}</ThemedText>
 
             <CustomMarkdown>{anecdote.content1}</CustomMarkdown>
-
-            {anecdote.content4 ? (
-                <View style={{ marginTop: 16 }}>
-                    <Video videoId={anecdote.content4} />
-                </View>
-            ) : null}
 
             {anecdote.content2 ? (
                 <ExternalLink
