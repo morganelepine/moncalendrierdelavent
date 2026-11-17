@@ -29,7 +29,12 @@ export const BingoCell: React.FC<BingoCellProps> = ({
             {cell.image ? (
                 <Image
                     source={{ uri: getCloudinaryImageUrl(cell.image) }}
-                    style={styles.itemBackground}
+                    style={[
+                        styles.itemBackground,
+                        {
+                            borderWidth: isClicked ? 0 : 0.5,
+                        },
+                    ]}
                     contentFit="contain"
                     cachePolicy="memory-disk"
                 />
@@ -49,6 +54,7 @@ const styles = StyleSheet.create({
     itemBackground: {
         width: "100%",
         height: "100%",
+        borderColor: Colors.snow,
     },
     textCard: {
         flex: 1,
